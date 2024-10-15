@@ -1,5 +1,5 @@
 ###########################################################################@
-# This script is for testing the model_xss.h5 file with file input
+# This script is for testing the model_sql.h5 file with file input
 ###########################################################################@
 import pandas as pd
 import pickle
@@ -11,14 +11,14 @@ from tensorflow.keras.models import load_model
 ###########################################################################@
 
 #Paths
-token_path = './IA/Tokens/xss.tokens'
-model_path = './IA/Models/model_xss.h5'
-xss_payload_file_path = './Scripts/Tests/Samples/xss-payload-list.txt'  # Path to the XSS payload file
-xss_safe_file_path = './Scripts/Tests/Samples/xss-safe-list.txt'  # Path to the XSS safe file
+token_path = './IA/Tokens/sql.tokens'
+model_path = './IA/Models/model_sql.h5'
+xss_payload_file_path = './Scripts/Tests/Samples/sql-payload-list.txt'  # Path to the SQL payload file
+
 #Test
-limit_test = 1000
+limit_test = 10000
 #Model parameters
-paranoia = 0.5
+paranoia = 0.8
 vocab_size = 8000
 max_length = 300
 embedding_dim = 16
@@ -51,20 +51,27 @@ def read_xss_payloads(file_path, limit=None):
         if limit:
             lines = lines[:limit]
         return lines
-    
-#4. Read XSS safe from file with a limit
-def read_xss_safe(file_path, limit=None):
-    with open(file_path, 'r') as file:
-        lines = [line.strip() for line in file.readlines()]
-        if limit:
-            lines = lines[:limit]
-        return lines
 
 #5. List of SAFE queries to test
 print("\n###############################################@")
 print(" Testing the model with SAFE queries")
 print("###############################################@")
-queries_known_as_safe = read_xss_safe(xss_safe_file_path, limit=limit_test)
+queries_known_as_safe = [
+'SELECT banner FROM v$version WHERE banner LIKE ‘Oracle%’;',
+'SELECT banner FROM v$version WHERE banner LIKE ‘TNS%’;',
+'SELECT version FROM v$instance;',
+'SELECT 1 FROM users -- comment',
+'SELECT username FROM all_users ORDER BY username;',
+'SELECT name FROM sys.user$; — priv',
+'SELECT name FROM v$database;',
+'SELECT instance_name FROM v$instance;',
+'SELECT column_name FROM all_tab_columns WHERE table_name = ‘blah’ and owner = ‘your_schema_name’;',
+'SELECT table_name FROM all_tables;',
+'SELECT owner, table_name FROM all_tables;',
+'SELECT first_name || ' ' || last_name AS full_name FROM employees;',
+'SELECT UTL_INADDR.get_host_address(‘microsoft.com’) FROM dual;',
+'SELECT UTL_HTTP.REQUEST(‘<http://microsoft.com>’) FROM dual;'
+]
 
 safe_correct = 0
 for query_text in queries_known_as_safe:
