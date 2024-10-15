@@ -24,7 +24,7 @@ model_path = './IA/Models/model_sql.h5'
 verbose_mode = False
 
 #Model parameters
-vocab_size = 5000
+vocab_size = 8000
 max_length = 300
 embedding_dim = 16
 

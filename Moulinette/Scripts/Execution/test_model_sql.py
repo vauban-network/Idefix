@@ -16,7 +16,7 @@ model_path = './IA/Models/model_sql.h5'
 
 #Model parameters
 paranoia = 0.8
-vocab_size = 5000
+vocab_size = 8000
 max_length = 300
 embedding_dim = 16
 
