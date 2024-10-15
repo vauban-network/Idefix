@@ -1,5 +1,5 @@
 ###########################################################################@
-# This script is the server for the SQL MODEL
+# This script is the server for the XSS MODEL
 ###########################################################################@
 import pandas as pd
 import pickle
@@ -12,18 +12,18 @@ import socket
 ###########################################################################@
 
 #Paths
-token_path = './IA/Tokens/sql.tokens'
-model_path = './IA/Models/model_sql.h5'
+token_path = './IA/Tokens/xss.tokens'
+model_path = './IA/Models/model_xss.h5'
 
 #Model parameters
-paranoia = 0.8
+paranoia = 0.5
 vocab_size = 8000
 max_length = 300
 embedding_dim = 16
 
 # Socket parameters
 HOST = '127.0.0.1'  # Localhost
-PORT = 3000         # Port to listen on
+PORT = 3001         # Port to listen on
 
 ###########################################################################@
 # Testing the model
@@ -56,7 +56,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen()
     print("\n###############################################@")
-    print(" Server SQL listening on IP:", HOST, " Port:", PORT)
+    print(" Server XSS listening on IP:", HOST, " Port:", PORT)
     print("###############################################@")
     while True:
         conn, addr = s.accept()
