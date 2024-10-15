@@ -3,25 +3,19 @@
 ###########################################################################@
 import pandas as pd
 import pickle
-from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, Dense, GlobalAveragePooling1D
-from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import load_model
-from sklearn.model_selection import train_test_split
 
 ###########################################################################@
 # Parameters 
 ###########################################################################@
 
 #Paths
-dataset_path = './Datasets/sql-dataset.csv'
 token_path = './IA/Tokens/sql.tokens'
 model_path = './IA/Models/model_sql.h5'
 
 #Model parameters
-paranoia = 0.5
+paranoia = 0.8
 vocab_size = 5000
 max_length = 300
 embedding_dim = 16
@@ -31,21 +25,21 @@ embedding_dim = 16
 ###########################################################################@
 
 #1.Load the tokenizer
-with open('./IA/Tokens/sql.tokens', 'rb') as file:
+with open(token_path, 'rb') as file:
     tokenizer = pickle.load(file)
 #2.Load the model
-model = load_model('./IA/Models/model_sql.h5')
+model = load_model(model_path)
 
 #3. Predict function
 def verify_query(query):
     query_sequence = tokenizer.texts_to_sequences([query])
-    padded_sequence = pad_sequences(query_sequence, maxlen=300, padding='post', truncating='post')
+    padded_sequence = pad_sequences(query_sequence, maxlen=max_length, padding='post', truncating='post')
     prediction = model.predict(padded_sequence)
     result = prediction[0][0]
     if result > paranoia:
-        return str(result) + " Verdict: MALICIOUS"
+        return str(result) + " Verdict: MALICIOUS", "MALICIOUS"
     else:
-        return str(result) + " Verdict: SAFE"
+        return str(result) + " Verdict: SAFE", "SAFE"
 
 #4. List of SAFE queries to test
 print("\n###############################################@")
@@ -67,9 +61,13 @@ queries_known_as_safe = [
 'SELECT UTL_INADDR.get_host_address(‘microsoft.com’) FROM dual;',
 'SELECT UTL_HTTP.REQUEST(‘<http://microsoft.com>’) FROM dual;'
 ]
+
+safe_correct = 0
 for query_text in queries_known_as_safe:
-    result = verify_query(query_text)
+    result, verdict = verify_query(query_text)
     print(f"This query is considered as : {result}")
+    if verdict == "SAFE":
+        safe_correct += 1
 
 #5. List of MALICIOUS queries to test
 print("\n###############################################@")
@@ -117,9 +115,24 @@ queries_known_as_malicious = [
     # 20. SQLi authentication with nullification
     "SELECT * FROM Users WHERE Username = 'admin' AND Password = 'password' OR 'x'='x';"
 ]
+
+malicious_correct = 0
 for query_text in queries_known_as_malicious:
-    result = verify_query(query_text)
+    result, verdict = verify_query(query_text)
     print(f"This query is considered as : {result}")
+    if verdict == "MALICIOUS":
+        malicious_correct += 1
 
+#6. Calculate and print statistics
+total_safe = len(queries_known_as_safe)
+total_malicious = len(queries_known_as_malicious)
 
+safe_accuracy = (safe_correct / total_safe) * 100
+malicious_accuracy = (malicious_correct / total_malicious) * 100
 
+print("\n###############################################@")
+print(" Statistics")
+print("###############################################@")
+print(f"Safe queries success rate: {safe_accuracy:.2f}%")
+print(f"Malicious queries success rate: {malicious_accuracy:.2f}%")
+print("")

@@ -84,39 +84,3 @@ print("[DONE] Script executed successfully")
 print("[i] Model trained and saved in: ", model_path)
 print("[i] Tokenizer saved in", token_path)
 print("###############################################@")
-
- 
-"""
-
-with open('./IA/Tokens/sql.tokens', 'rb') as file:
-    tokenizer = pickle.load(file)
-
-model = load_model('./IA/Models/model_sql.h5')
-
-# Fonction pour prédire si un e-mail est un spam ou non
-def predict_query(query):
-    email_sequence = tokenizer.texts_to_sequences([query])
-    padded_sequence = pad_sequences(email_sequence, maxlen=300, padding='post', truncating='post')
-    prediction = model.predict(padded_sequence)
-    resultat = prediction[0][0]
-    print("Resultat: ", resultat)
-    if resultat > 0.5:
-        return "MALICIOUS"
-    else:
-        return "SAFE"
-
-
-# Exemple d'utilisation :
-query_text = "SELECT * FROM Users WHERE UserId = 105 OR 1=1;"
-result = predict_query(query_text)
-print(f"This query is considered as : {result}")
-query_text = "SELECT * FROM Users WHERE Name ="" or ""="" AND Pass ="" or ""="" "
-result = predict_query(query_text)
-print(f"This query is considered as : {result}")
-query_text = "SELECT * FROM Users WHERE Name ="" or ""="" AND Pass ="" or ""="" "
-result = predict_query(query_text)
-print(f"This query is considered as : {result}")
-query_text = 'SELECT * FROM Users WHERE Name ="John Doe" AND Pass ="myPass"'
-result = predict_query(query_text)
-print(f"This query is considered as : {result}")
-"""
