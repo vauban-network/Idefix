@@ -1,23 +1,23 @@
 ###########################################################################@
-# This script is the client example for the SQL MODEL
+# This script is the client example for the MAIN
 ###########################################################################@
 import socket
 
 ###########################################################################@
 # Parameters 
 ###########################################################################@
-HOST = '127.0.0.1'  # L'adresse IP de l'hôte (localhost dans ce cas)
-PORT = 3002         # Le port utilisé par le serveur
+HOST = '127.0.0.1'  
+PORT = 3000      
 
 ###########################################################################@
 # Testing the server
 ###########################################################################@
 print("\n###############################################@")
-print(" Client asking to server XSS IP:", HOST, " Port:", PORT)
+print(" Client asking to server SQL:", HOST, " Port:", PORT)
 print("###############################################@")
 while True:
-    # Ask for SQL query
-    query = input("Type XSS request (or 'q' to quit): ")   
+    # Ask for query
+    query = input("Type any web request (or 'q' to quit): ")   
     # q to quit
     if query.lower() == 'q':
         break

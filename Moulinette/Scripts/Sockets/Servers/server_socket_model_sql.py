@@ -6,7 +6,7 @@ import pickle
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import load_model
 import socket
-
+from _conf import HEART_SQL_IP, HEART_SQL_PORT, HEART_SQL_PARANOIA
 ###########################################################################@
 # Parameters 
 ###########################################################################@
@@ -16,14 +16,14 @@ token_path = './IA/Tokens/sql.tokens'
 model_path = './IA/Models/model_sql.h5'
 
 #Model parameters
-paranoia = 0.8
+#paranoia = HEART_SQL_PARANOIA
 vocab_size = 8000
 max_length = 300
 embedding_dim = 16
 
 # Socket parameters
-HOST = '127.0.0.1'  # Localhost
-PORT = 3000         # Port to listen on
+HOST = HEART_SQL_IP
+PORT = HEART_SQL_PORT
 
 ###########################################################################@
 # Testing the model
@@ -42,12 +42,8 @@ def verify_query(query):
     padded_sequence = pad_sequences(query_sequence, maxlen=max_length, padding='post', truncating='post')
     prediction = model.predict(padded_sequence)
     result = prediction[0][0]
-    if result > paranoia:
-        print(str(result) + " Verdict: MALICIOUS")
-        return str(result) + " Verdict: MALICIOUS", "MALICIOUS"
-    else:
-        print(str(result) + " Verdict: SAFE")
-        return str(result) + " Verdict: SAFE", "SAFE"
+    print(str(result))
+    return str(result)
 
 ###########################################################################@
 # Socket server
@@ -60,13 +56,29 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("###############################################@")
     while True:
         conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr}")
-            data = conn.recv(1024)
-            if not data:
-                break
-            query = data.decode('utf-8')
-            print(query)
-            result, verdict = verify_query(query)
-            response = f"{result}\n"
-            conn.sendall(response.encode('utf-8'))
+        try:
+            with conn:
+                #Receiving connections
+                print(f"\n[NET-IN] --> Connected by {addr}")
+                data = conn.recv(1024)
+                #If healthcheck
+                if(data == b'HEALTHCHECK'):
+                    print(f"[NET-IN] --> Healthcheck received from {addr}")
+                    print(f"[NET-OUT] --> Responded OK.")
+                    conn.sendall(b'OK')
+                    continue
+                if not data:
+                    print(f"[ERROR] No data received from {addr}")
+                #Decoding query
+                query = data.decode('utf-8')
+                print("[NET-IN] --> Query received:", query)
+                #Verifying query
+                print("[i] --> Verifying query...")
+                score = verify_query(query)
+                #Sending score
+                print(f"[i] --> Score predicted: {score}")
+                response = f"{score}"
+                print(f"[NET-OUT] --> Sending response: {response}")
+                conn.sendall(response.encode('utf-8'))
+        except Exception as e:
+            print(f"[ERROR] An error occurred with {addr}: {e}")
