@@ -1,21 +1,23 @@
 from _conf import *
 import socket
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 ###########################################################################@
 # Variables
 ###########################################################################@
 
-#List of all hearts from _conf.py
+# List of all hearts from _conf.py
 list_of_hearts = HEARTS
-#Main server configuration
+# Main server configuration
 HOST = MAIN_IP
 PORT = MAIN_PORT
 TIMEOUT_DELAY = MAIN_TIMEOUT_DELAY
+
 ###########################################################################@
 # Functions
 ###########################################################################@
 
-#Function to check if a heart is running
+# Function to check if a heart is running
 def check_heart_health(socket_name, socket_ip, socket_port):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -29,26 +31,37 @@ def check_heart_health(socket_name, socket_ip, socket_port):
         print(f"[ERROR] Socket {socket_name} is closed: {e}")
         return False
 
-#Function to query the hearts and get the score
+# Function to query a single heart
+def query_heart(heart_name, query):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            verdict = 404
+            s.connect((globals()[f"HEART_{heart_name}_IP"], globals()[f"HEART_{heart_name}_PORT"]))
+            s.sendall(query.encode('utf-8'))
+            response = float(s.recv(1024).decode('utf-8'))
+            if response > globals()[f"HEART_{heart_name}_PARANOIA"]:
+                verdict = "1"
+            else:
+                verdict = "0"
+            return (heart_name, response, verdict)
+    except Exception as e:
+        return (heart_name, "404", "404")
+
+# Function to query the hearts and get the score
 def check_query_to_hearts(query):
     responses = []
-    for heart_name in list_of_hearts:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                verdict = 404
-                s.connect((globals()[f"HEART_{heart_name}_IP"], globals()[f"HEART_{heart_name}_PORT"]))
-                s.sendall(query.encode('utf-8'))
-                response = float(s.recv(1024).decode('utf-8'))
-                if(response > globals()[f"HEART_{heart_name}_PARANOIA"]):
-                    verdict = "1"
-                else:
-                    verdict = "0"
-                responses.append((heart_name, response, verdict))
-        except Exception as e:
-            responses.append((heart_name, "404", "404"))
+    with ThreadPoolExecutor() as executor:
+        future_to_heart = {executor.submit(query_heart, heart_name, query): heart_name for heart_name in list_of_hearts}
+        for future in as_completed(future_to_heart):
+            heart_name = future_to_heart[future]
+            try:
+                response = future.result()
+                responses.append(response)
+            except Exception as e:
+                responses.append((heart_name, "404", "404"))
     return responses
 
-#Function to calculate the final result with scores from all hearts
+# Function to calculate the final result with scores from all hearts
 def calculate_final_result(responses):
     has_one = False
     all_zeros = True
@@ -70,14 +83,13 @@ def calculate_final_result(responses):
     else:
         return "ERROR"
 
-
 ###########################################################################@
 # Main code - Heart check and server start
 ###########################################################################@
 
-#Checking if all hearts are running
+# Checking if all hearts are running
 print("\n###############################################@")
-print("[i] Sarting... Checking heart states...")
+print("[i] Starting... Checking heart states...")
 print("###############################################@")
 all_hearts_running = True
 for heart_name in list_of_hearts:
@@ -97,7 +109,7 @@ else:
 # Main code - Server core
 ###########################################################################@
 
-#Socket
+# Socket
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen()
@@ -108,12 +120,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         conn, addr = s.accept()
         try:
             with conn:
-                #Receiving connections
+                # Receiving connections
                 print(f"\n[NET-IN] --> Connected by {addr}")
                 conn.settimeout(TIMEOUT_DELAY)
                 print(f"[NET-IN] Waiting for data from {addr}")
                 data = conn.recv(1024)
-                print(f"[NET-IN] Data received: {data}")    
+                #print(f"[NET-IN] Data received: {data}")    
                 if not data or len(data) == 0:
                     print(f"[NET-IN] --> No data received from {addr}")
                     print(f"[NET-OUT] <-- Default result: UNKNOWN")
@@ -121,17 +133,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     conn.close()
                 else:
                     query = data.decode('utf-8')
-                    #Received query
+                    # Received query
                     print(f"[NET-IN] --> Received query: {query}")
-                    #Querying hearts
+                    # Querying hearts
                     print(f"[i] Querying hearts...")
                     responses = check_query_to_hearts(query)
                     print(f"[i] Responses: {responses}")
-                    #Calculating final result
+                    # Calculating final result
                     print(f"[i] Calculating final result...")
                     final_result = calculate_final_result(responses)
                     print(f"[i] Verdict: {final_result}")
-                    #Sending final result to client
+                    # Sending final result to client
                     print(f"[NET-OUT] <-- Final result: {final_result}")
                     conn.sendall(final_result.encode('utf-8'))
                     conn.close()
