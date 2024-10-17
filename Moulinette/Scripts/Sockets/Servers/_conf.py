@@ -1,6 +1,8 @@
 #Main server configuration
 MAIN_IP = "127.0.0.1"
 MAIN_PORT = 3000
+MAIN_TIMEOUT_DELAY = 0.5
+
 #List of hearts
 HEARTS = ["SQL", "XSS"]
 #Set IPs for the hearts

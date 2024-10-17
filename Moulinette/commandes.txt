@@ -1,1 +1,2 @@
 source .venv/bin/activate
+cd Idefix/Moulinette && source .venv/bin/activate

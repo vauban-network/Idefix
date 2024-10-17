@@ -10,7 +10,7 @@ list_of_hearts = HEARTS
 #Main server configuration
 HOST = MAIN_IP
 PORT = MAIN_PORT
-
+TIMEOUT_DELAY = MAIN_TIMEOUT_DELAY
 ###########################################################################@
 # Functions
 ###########################################################################@
@@ -110,9 +110,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             with conn:
                 #Receiving connections
                 print(f"\n[NET-IN] --> Connected by {addr}")
+                conn.settimeout(TIMEOUT_DELAY)
+                print(f"[NET-IN] Waiting for data from {addr}")
                 data = conn.recv(1024)
-                if not data:
+                print(f"[NET-IN] Data received: {data}")    
+                if not data or len(data) == 0:
                     print(f"[NET-IN] --> No data received from {addr}")
+                    print(f"[NET-OUT] <-- Default result: UNKNOWN")
+                    conn.sendall("UNKNOWN".encode('utf-8'))
+                    conn.close()
                 else:
                     query = data.decode('utf-8')
                     #Received query
@@ -128,6 +134,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     #Sending final result to client
                     print(f"[NET-OUT] <-- Final result: {final_result}")
                     conn.sendall(final_result.encode('utf-8'))
+                    conn.close()
+
+        except socket.timeout:
+            print(f"[ERROR] Timeout occurred with {addr}")
+            # Send a response only if the socket is still active
+            try:
+                conn.sendall("TIMEOUT".encode('utf-8'))
+            except OSError:
+                print(f"[ERROR] Could not send TIMEOUT message, socket already closed for {addr}")
         except Exception as e:
             print(f"[ERROR] An error occurred with {addr}: {e}")
-

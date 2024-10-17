@@ -81,5 +81,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 response = f"{score}"
                 print(f"[NET-OUT] --> Sending response: {response}")
                 conn.sendall(response.encode('utf-8'))
+                conn.close()
         except Exception as e:
             print(f"[ERROR] An error occurred with {addr}: {e}")
