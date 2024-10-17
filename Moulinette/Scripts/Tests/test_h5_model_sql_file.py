@@ -18,7 +18,7 @@ xss_payload_file_path = './Scripts/Tests/Samples/sql-payload-list.txt'  # Path t
 #Test
 limit_test = 10000
 #Model parameters
-paranoia = 0.8
+paranoia = 0.5
 vocab_size = 8000
 max_length = 300
 embedding_dim = 16

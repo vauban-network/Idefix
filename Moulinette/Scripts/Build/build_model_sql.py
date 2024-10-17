@@ -11,6 +11,7 @@ from tensorflow.keras.layers import Embedding, Dense, GlobalAveragePooling1D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import load_model
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
 
 ###########################################################################@
 # Parameters 
@@ -20,6 +21,7 @@ from sklearn.model_selection import train_test_split
 dataset_path = './Datasets/sql-dataset.csv'
 token_path = './IA/Tokens/sql.tokens'
 model_path = './IA/Models/model_sql.h5'
+model_lite_path = './IA/Models/model_sql_lite.tflite'
 
 #Utils
 verbose_mode = False
@@ -80,8 +82,26 @@ model.fit(X_train, y_train, epochs=5, validation_data=(X_test, y_test))
 print("[i] Saving .h5 file...")
 model.save(model_path)
 
+#6. Optimize model
+print("[i] Optimizing .h5 file...")
+
+#Load model
+model = load_model(model_path)
+
+#Convert to TensorFlow Lite
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+tflite_model = converter.convert()
+
+#Save to TFLite
+print("[i] Saving .tflite file...")
+with open(model_lite_path, 'wb') as f:
+    f.write(tflite_model)
+
 print("\n###############################################@")
 print("[DONE] Script executed successfully")
 print("[i] Model trained and saved in: ", model_path)
+print("[i] Lite trained and saved in: ", model_lite_path)
 print("[i] Tokenizer saved in", token_path)
 print("###############################################@")
+
