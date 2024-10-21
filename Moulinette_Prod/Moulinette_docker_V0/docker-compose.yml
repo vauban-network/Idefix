@@ -1,0 +1,19 @@
+
+services:
+  server_sql:
+    build: ./CONTAINERS/SQL
+    ports:
+      - "3001:3001"
+
+  server_xss:
+    build: ./CONTAINERS/XSS
+    ports:
+      - "3002:3002"
+
+  server_main:
+    build: ./CONTAINERS/MAIN
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server_sql
+      - server_xss
