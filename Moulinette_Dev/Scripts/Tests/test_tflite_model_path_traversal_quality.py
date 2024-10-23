@@ -9,8 +9,8 @@ HOST = '127.0.0.1'
 PORT = 3000      
 
 # Paths
-safe_payload_file_path = './Samples/sql-safe-list.txt'  # Path to the SQL safe payload file
-malicious_payload_file_path = './Samples/sql-payload-list.txt'  # Path to the SQL malicious payload file
+safe_payload_file_path = './Scripts/Tests/Samples/xss-safe-list.txt'  # Path to the SQL safe payload file
+malicious_payload_file_path = './Scripts/Tests/Samples/xss-payload-list.txt'  # Path to the SQL malicious payload file
 
 limit_test = 10000  # Limit for malicious queries
 

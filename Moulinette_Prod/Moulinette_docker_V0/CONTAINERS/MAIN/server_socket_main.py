@@ -1,4 +1,5 @@
 import asyncio
+import json
 import socket
 from concurrent.futures import ThreadPoolExecutor
 
@@ -112,6 +113,7 @@ async def main():
         print("###############################################@")
         await server.serve_forever()
 
+#RECEIVING REQUESTS
 async def handle_client(reader, writer):
     addr = writer.get_extra_info('peername')
     try:
@@ -122,14 +124,34 @@ async def handle_client(reader, writer):
             print(f"[NET-OUT] <-- Default result: UNKNOWN")
             writer.write("UNKNOWN".encode('utf-8'))
         else:
-            query = data.decode('utf-8')
-            print(f"[NET-IN] --> Received query: {query}")
-            print(f"[i] Querying hearts...")
-            responses = await check_query_to_hearts(query)
-            print(f"[i] Responses: {responses}")
-            print(f"[i] Calculating final result...")
-            final_result = calculate_final_result(responses)
-            print(f"[i] Verdict: {final_result}")
+            #Parsing request
+            request = json.loads(data.decode('utf-8'))
+            print(f"[NET-IN] --> Received query: {request}")
+            uri = request.get('uri', '')
+            body = request.get('body', '')
+            #Querying hearts for URI
+            print(f"[i] Querying hearts for URI...")
+            responses = await check_query_to_hearts(uri)
+            print(f"[i] Responses URI: {responses}")
+            print(f"[i] Calculating final result URI...")
+            uri_final_result = calculate_final_result(responses)
+            print(f"[i] Verdict URI: {uri_final_result}")
+            #Querying hearts for BODY
+            print(f"[i] Querying hearts for BODY...")
+            responses = await check_query_to_hearts(body)
+            print(f"[i] Responses BODY: {responses}")
+            print(f"[i] Calculating final result BODY...")
+            body_final_result = calculate_final_result(responses)
+            print(f"[i] Verdict BODY: {body_final_result}")
+            #Final result
+            final_result = "ERROR"
+            if(body_final_result == "MALICIOUS" or uri_final_result == "MALICIOUS"):
+                if(body_final_result == "ERROR" and uri_final_result == "ERROR"):
+                    final_result = "ERROR"
+                else:
+                    final_result = "MALICIOUS"
+            else:
+                final_result = "SAFE"
             print(f"[NET-OUT] <-- Final result: {final_result}")
             writer.write(final_result.encode('utf-8'))
         await writer.drain()

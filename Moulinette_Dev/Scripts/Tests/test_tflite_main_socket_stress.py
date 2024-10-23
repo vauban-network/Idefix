@@ -16,7 +16,7 @@ print(" Client asking to server SQL:", HOST, " Port:", PORT)
 print("###############################################@")
 
 # Readfile 
-mix_payload_file_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette/Scripts/Tests/Samples/mix-payload-list.txt'  # Path to the XSS payload file
+mix_payload_file_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/mix-payload-list.txt'  # Path to the XSS payload file
 def read_mix_payloads(file_path, limit=None):
     with open(file_path, 'r') as file:
         lines = [line.strip() for line in file.readlines()]

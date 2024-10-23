@@ -5,7 +5,6 @@ MAIN_TIMEOUT_DELAY = 0.5
 
 #List of hearts
 HEARTS = ["SQL", "XSS", "PATH_TRAVERSAL"]
-
 #Set IPs for the hearts
 HEART_SQL_IP = "127.0.0.1"
 HEART_XSS_IP = "127.0.0.1"
