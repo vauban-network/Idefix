@@ -126,7 +126,7 @@ async def handle_client(reader, writer):
         else:
             #Parsing request
             request = json.loads(data.decode('utf-8'))
-            print(f"[NET-IN] --> Received query: {request}")
+            print(f"\n\n[NET-IN] --> Received query: {request}")
             uri = request.get('uri', '')
             body = request.get('body', '')
             #Querying hearts for URI
@@ -145,13 +145,13 @@ async def handle_client(reader, writer):
             print(f"[i] Verdict BODY: {body_final_result}")
             #Final result
             final_result = "ERROR"
-            if(body_final_result == "MALICIOUS" or uri_final_result == "MALICIOUS"):
-                if(body_final_result == "ERROR" and uri_final_result == "ERROR"):
-                    final_result = "ERROR"
-                else:
+            if(body_final_result == "ERROR" and uri_final_result == "ERROR"):
+                final_result = "ERROR"
+            else: 
+                if(body_final_result == "MALICIOUS" or uri_final_result == "MALICIOUS"):
                     final_result = "MALICIOUS"
-            else:
-                final_result = "SAFE"
+                else:
+                    final_result = "SAFE"
             print(f"[NET-OUT] <-- Final result: {final_result}")
             writer.write(final_result.encode('utf-8'))
         await writer.drain()
