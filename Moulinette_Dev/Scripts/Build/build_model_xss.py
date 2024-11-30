@@ -18,7 +18,7 @@ import tensorflow as tf
 ###########################################################################@
 
 # Paths
-dataset_path = './Datasets/xss-dataset.csv'
+dataset_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Datasets/xss-dataset-cleaned.csv'
 token_path = './IA/Tokens/xss.tokens'
 model_path = './IA/Models/model_xss.h5'
 model_lite_path = './IA/Models/model_xss_lite.tflite'

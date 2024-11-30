@@ -1,5 +1,3 @@
-
-
 "><script>"
 <script>alert("WXSS")</script>
 <<script>alert("WXSS");//<</script>
