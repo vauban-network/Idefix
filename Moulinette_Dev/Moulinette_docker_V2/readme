@@ -1,0 +1,14 @@
+
+INPUT : 
+http://ip:port
+Type : POST
+Content-Type : application/json
+body : raw json
+
+CAUTION !! Content-Type application/json is mandatory
+---- 
+
+
+OUTPUT :
+MALICIOUS
+SAFE
