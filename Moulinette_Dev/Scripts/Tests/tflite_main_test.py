@@ -29,6 +29,10 @@ attack_files = {
         "safe": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/sql-safe-list.txt',
         "malicious": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/sql-payload-list.txt'
     },
+    "TRAVERSAL": {
+        "safe": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/traversal-safe-list.txt',
+        "malicious": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/traversal-payload-list.txt'
+    },
 }
 
 # Limits

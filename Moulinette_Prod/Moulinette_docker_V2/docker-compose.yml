@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  container-moulinette:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    restart: always
+    environment:
+      - FLASK_ENV=development
+    container_name: container-moulinette

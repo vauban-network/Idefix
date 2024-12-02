@@ -18,18 +18,18 @@ import tensorflow as tf
 ###########################################################################@
 
 # Paths
-dataset_path = './Datasets/path_traversal-dataset-gpt.csv'
-token_path = './IA/Tokens/path_traversal.tokens'
-model_path = './IA/Models/model_path_traversal.h5'
-model_lite_path = './IA/Models/model_path_traversal_lite.tflite'
+dataset_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Datasets/path_traversal_dataset_v1.csv'
+token_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/IA/Tokens/path_traversal.tokens'
+model_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/IA/Models/model_path_traversal.h5'
+model_lite_path = '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/IA/Models/model_path_traversal_lite.tflite'
 
 # Utils
 verbose_mode = False
 
 # Model parameters
-vocab_size = 10000
-max_length = 500
-embedding_dim = 32
+vocab_size = 20000
+max_length = 20
+embedding_dim = 256
 
 ###########################################################################@
 # Utils 
@@ -44,7 +44,7 @@ def print_verbose(text):
 # 1. Load the data
 print("[i] Reading the dataset...")
 data = pd.read_csv(dataset_path, delimiter=',')
-queries = data['Path']
+queries = data['Sentence']
 labels = data['Label']
 print_verbose(data.columns)
 print_verbose(queries.head())

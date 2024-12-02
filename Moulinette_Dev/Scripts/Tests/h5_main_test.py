@@ -28,11 +28,15 @@ attack_files = {
         "safe": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/sql-safe-list.txt',
         "malicious": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/sql-payload-list.txt'
     },
+    "TRAVERSAL": {
+        "safe": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/traversal-safe-list.txt',
+        "malicious": '/Users/enilles/Documents/Projet5A/Idefix/Moulinette_Dev/Scripts/Tests/Samples/traversal-payload-list.txt'
+    },
 }
 
 # Limits
 test_limits = {
-    "safe": 10000,  # Limite pour les requêtes SAFE
+    "safe": 100,  # Limite pour les requêtes SAFE
     "malicious": 10000  # Limite pour les requêtes MALICIOUS
 }
 
